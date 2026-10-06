@@ -48,8 +48,8 @@ addLayer("p", {
     upgrades: {
         11: {
             title: "让底数有效果",
-            description: "每秒获取金币底数+1个金币",
-            cost: new Decimal(10),
+            description: "每秒获取(金币底数+1)个金币",
+            cost: new Decimal(5),
             effect() {
         return player[this.layer].points.add(1)
         }, // Calculate the effect of the upgrade. Can be a function that takes into account current game state.
@@ -60,7 +60,8 @@ addLayer("p", {
     1: {
         requirementDescription: "达到1.00e10金币底数", // Optional text. Use if the milestone has no effect
         effectDescription: "解锁一个新层级",
-        done() { return player.p.points.gte(1e10) }
+        done() { return player.p.points.gte(1e10) },
+        onComplete(){unlocked('p',1)}
     }
     },
     microtabs:{
@@ -120,7 +121,7 @@ addLayer("cs1", {
         11: {
             title: "MUL1",
             description: "金币获取乘以(第一乘数+1)",
-            cost: new Decimal(10),
+            cost: new Decimal(5),
             effect() {
         return player[this.layer].points.add(1)
         }, // Calculate the effect of the upgrade. Can be a function that takes into account current game state.
@@ -158,7 +159,7 @@ addLayer("cs1", {
        "blank",
        ["microtabs","tab"]
     ],
-    layerShown(){if(hasMilestone('p', 1)) { return true } },
+    layerShown(){if(hasMilestone('p', 1)||player.cs1.points.gte(1)) { return true } },
 })
 // You can delete the second name from each option if internationalizationMod is not enabled.
 // You can use function i18n(text, otherText) to return text in two different languages. Typically, text is English and otherText is Chinese. If changedDefaultLanguage is true, its reversed
