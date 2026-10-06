@@ -1,9 +1,9 @@
 let modInfo = {
 	name: "简易增量",
 	nameI18N: "The jyzl Table",// When you enabled the internationalizationMod, this is the name in the second language
-	id: "jyzl",
+	id: "111",
 	author: "未止",
-	pointsName: "points",
+	pointsName: "金币",
 	modFiles: ["layers.js", "tree.js"],
 
 	internationalizationMod: false,
