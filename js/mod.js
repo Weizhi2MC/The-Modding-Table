@@ -8,10 +8,10 @@ let modInfo = {
 
 	internationalizationMod: false,
 	// When enabled, it will ask the player to choose a language at the beginning of the game
-	changedDefaultLanguage: false,
+	changedDefaultLanguage: true,
 	// Changes the mod default language. false -> English, true -> Chinese
 
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
 	offlineLimit: 1,  // In hours
 }
 
@@ -83,9 +83,11 @@ function canGenPoints(){
 // Calculate points/sec!
 function getPointGen() {
 	if(!canGenPoints())
+
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
+	if (hasUpgrade('p', 11)) gain = gain.times(upgradeEffect('p', 11)).mul(1)
 	return gain
 }
 
@@ -103,7 +105,7 @@ var displayThings = [
 
 // You can write code here to easily display information in the top-left corner
 function displayThingsRes(){
-	return 'Points: '+format(player.points)+' | '
+	return '金币: '+format(player.points)+' | '
 }
 
 // Determines when the game "ends"
