@@ -1,7 +1,7 @@
 let modInfo = {
-	name: "简易增量",
+	name: "简易增量页",
 	nameI18N: "The jyzl Table",// When you enabled the internationalizationMod, this is the name in the second language
-	id: "111",
+	id: "1",
 	author: "未止",
 	pointsName: "金币",
 	modFiles: ["layers.js", "tree.js"],
@@ -41,7 +41,7 @@ function hiddenLeftTable(){
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
+	num: "0.1",
 	name: "Literally nothing",
 }
 
@@ -50,17 +50,12 @@ function changelog(){
 		<br><br><br><h1>更新日志:</h1><br>(不存在<span style='color: red'><s>剧透警告</s></span>)<br><br>
 		<span style="font-size: 17px;">
 			<h3><s>你应该自己写这个</s></h3><br><br>
-			<h3>v3.0 - 史无前例的改动</h3><br>
-				- 开发了 The Modding Table, 这何尝不是一种TMT<br>
+			<h3>v0.1 - 创作了简易增量页</h3><br>
+				- 从I wanna be the Creator中的简易增量的二创<br>
+			这游戏体验何尝不是一种NG-x<br><br>- 更新至第二乘数u3
 			<br><br>
-		`, `
-		<br><br><br><h1>ChangeLog:</h1><br>(No<span style='color: red'><s> Spoiler Warning!</s></span>)<br><br>
-		<span style="font-size: 17px;">
-			<h3><s>YOU SHOULD WRITE THIS YOURSELF</s></h3><br><br>
-			<h3>v3.0 - Unprecedented changes</h3><br>
-				- Developed The Modding Table, Which, you could say, is another form of TMT<br>
-			<br><br>
-	`, false)
+		`, 
+	'', false)
 } 
 
 function winText(){
@@ -87,7 +82,10 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
-	if (hasUpgrade('p', 11)) gain = gain.times(upgradeEffect('p', 11)).mul(1)
+	if (hasUpgrade('p', 11)) gain = gain.times(upgradeEffect('p', 11))
+	if (hasUpgrade('cs1', 11)) gain = gain.times(upgradeEffect('cs1', 11))
+	if (hasUpgrade('cs2', 11)) gain = gain.times(upgradeEffect('cs2', 11))
+	
 	return gain
 }
 
