@@ -70,6 +70,7 @@ addLayer("p", {
         if (resettingLayer === "p") return
         //let keep = tmp[resettingLayer].row > tmp.p.row ? ["milestones", "upgrades"] : []
         let keep = tmp[resettingLayer].row > tmp.p.row ? ["milestones"] : []
+        if(hasUpgrade('cs2',13)) keep = tmp[resettingLayer].row > tmp.p.row ? ["milestones","upgrades"] : []
         layerDataReset("p", keep)
     },
     microtabs:{
@@ -123,7 +124,7 @@ addLayer("cs1", {
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal(1)
         if (hasUpgrade('cs1', 14)) mult = mult.mul(player.p.points.add(1).log10().add(1).pow(0.5))
-        if (hasUpgrade('cs2', 12)) mult = mult.mul(player.cs2.points.mul(0.1).add(1).pow(0.2))
+        if (hasUpgrade('cs2', 12)) mult = mult.mul(upgradeEffect('cs2', 12))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -138,11 +139,6 @@ addLayer("cs1", {
         return player[this.layer].points.add(1)
         }, // Calculate the effect of the upgrade. Can be a function that takes into account current game state.
          effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, 
-        },
-        12: {
-            title: "今天你收歌了吗",
-            description: "底力+1",
-            return(){return true}
         },
         13: {
             title: "倍增器",
@@ -228,7 +224,8 @@ addLayer("cs2", {
     softcapPower: new Decimal("0.6"),
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal(1)
-        if (hasUpgrade('cs2', 13)) mult = mult.mul(player.cs1.points.add(1).log10().add(1).pow(0.45))
+        if (hasUpgrade('cs2', 14)) mult = mult.mul(upgradeEffect('cs2', 14))
+        if (hasMilestone('cs2', 1)) mult = mult.mul(2)
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -237,7 +234,7 @@ addLayer("cs2", {
     upgrades: {
         11: {
             title: "MUL2",
-            description: "金币获取乘以(第二乘数+1)",
+            description: "金币获取x(第二乘数+1)",
             cost: new Decimal(0),
             effect() {
         return player[this.layer].points.add(1)
@@ -247,27 +244,32 @@ addLayer("cs2", {
         12: {
             title: "倍增器<sup>2</sup>",
             description: "第二乘数以极其微弱的倍率加成第一乘数获取",
-            cost: new Decimal(5),
+            cost: new Decimal(2),
             effect() {
-        return player[this.layer].points.mul(0.1).add(1).pow(0.2)
+        return player[this.layer].points.mul(2).add(2).pow(0.15)
         }, // Calculate the effect of the upgrade. Can be a function that takes into account current game state.
          effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, 
         },
         13: {
+            title: "读写器",
+            description: "不再重置金币底数层的升级",
+            cost: new Decimal(1),
+        },
+        14: {
             title: "助推器<sup>2</sup>",
             description: "第一乘数以极其微弱的倍率加成第二乘数获取",
-            cost: new Decimal(25),
+            cost: new Decimal(10),
             effect() {
-        return player.cs1.points.add(1).log10().add(1).pow(0.45)
+        return player.cs1.points.add(1).log(40).add(1).pow(0.7)
         }, // Calculate the effect of the upgrade. Can be a function that takes into account current game state.
          effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, 
         },
     },
     milestones: {
     1: {
-        requirementDescription: "达到 <s>未止生气，残局下降</s> 第二乘数", // Optional text. Use if the milestone has no effect
-        effectDescription: "<s>解锁一个新层级</s> 已达残局",
-        done() { return player.cs2.points.gte(1e600) },
+        requirementDescription: "达到5.00第二乘数", // Optional text. Use if the milestone has no effect
+        effectDescription: "第二乘数获取x2",
+        done() { return player.cs2.points.gte(5) },
     }
     },    
     microtabs:{
@@ -277,7 +279,7 @@ addLayer("cs2", {
                 nameI18N(){return 'main'}, // Second name for internationalization (i18n) if internationalizationMod is enabled
                 content:[
                     ['row', [
-                        ['upgrade', 11], ['upgrade', 12], ['upgrade', 13]
+                        ['upgrade', 11], ['upgrade', 12],['upgrade', 13], ['upgrade', 14]
                     ]]
                 ],
             },

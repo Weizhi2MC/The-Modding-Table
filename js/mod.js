@@ -85,6 +85,7 @@ function getPointGen() {
 	if (hasUpgrade('p', 11)) gain = gain.times(upgradeEffect('p', 11))
 	if (hasUpgrade('cs1', 11)) gain = gain.times(upgradeEffect('cs1', 11))
 	if (hasUpgrade('cs2', 11)) gain = gain.times(upgradeEffect('cs2', 11))
+	if (player.points.gte(new Decimal(1.79e308))) gain = new Decimal(0),player.points = new Decimal("1.7977e308")
 	
 	return gain
 }
