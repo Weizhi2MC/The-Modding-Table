@@ -12,7 +12,7 @@ let modInfo = {
 	// Changes the mod default language. false -> English, true -> Chinese
 
 	initialStartPoints: new Decimal (0), // Used for hard resets and new players
-	offlineLimit: 1,  // In hours
+	offlineLimit: 0.5,  // In hours
 }
 
 var colors = {
@@ -52,7 +52,7 @@ function changelog(){
 			<h3><s>你应该自己写这个</s></h3><br><br>
 			<h3>v0.1 - 创作了简易增量页</h3><br>
 				- 从I wanna be the Creator中的简易增量的二创<br>
-			这游戏体验何尝不是一种NG-x<br><br>- 更新至第二乘数u3
+			这游戏体验何尝不是一种NG-x<br><br>- 更新至第二乘数层
 			<br><br>
 		`, 
 	'', false)
@@ -81,13 +81,13 @@ function getPointGen() {
 
 		return new Decimal(0)
 
-	let gain = new Decimal(1)
-	if (hasUpgrade('p', 11)) gain = gain.times(upgradeEffect('p', 11))
-	if (hasUpgrade('cs1', 11)) gain = gain.times(upgradeEffect('cs1', 11))
-	if (hasUpgrade('cs2', 11)) gain = gain.times(upgradeEffect('cs2', 11))
-	if (player.points.gte(new Decimal(1.79e308))) gain = new Decimal(0),player.points = new Decimal("1.7977e308")
-	
-	return gain
+	let g = new Decimal(1)
+	if (hasUpgrade('p', 11)) g = g.times(upgradeEffect('p', 11))
+	if (hasUpgrade('cs1', 11)) g = g.mul(upgradeEffect('cs1', 11))
+	if (hasUpgrade('cs2', 11)) g = g.mul(upgradeEffect('cs2', 11))
+	if (hasMilestone('cs2', 2)) g = g.pow(1.05)
+	if (hasMilestone('cs2', 3)) g = g.mul(buyableEffect('cs2', 2))
+	return g
 }
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
