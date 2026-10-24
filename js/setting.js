@@ -141,6 +141,12 @@ addLayer("A", {
             tooltip:'解锁条件:第二乘数≥1',
             onComplete(){player.A.points = new Decimal(player.A.points.add(1))}
         },
+        8:{
+            name:"a8<br>3rd Mul",
+            done(){return player.cs3.points.gte(1)},
+            tooltip:'解锁条件:第三乘数≥1',
+            onComplete(){player.A.points = new Decimal(player.A.points.add(1))}
+        },
     },
     doReset() {
         layerDataReset("A", ["achievements", "points"])
@@ -153,7 +159,7 @@ addLayer("A", {
                 nameI18N(){return 'main'}, // Second name for internationalization (i18n) if internationalizationMod is enabled
                 content:[
                     ['row',[
-                    ['achievement', 1],['achievement', 2],['achievement', 3],['achievement', 4],['achievement', 5],['achievement', 6],['achievement', 7]]
+                    ['achievement', 1],['achievement', 2],['achievement', 3],['achievement', 4],['achievement', 5],['achievement', 6],['achievement', 7],['achievement', 8]]
                 ],            
                 ],
             },

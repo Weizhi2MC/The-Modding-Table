@@ -26,7 +26,7 @@ function getResetGain(layer, useType = null) {
 	} else if (type=="normal"){
 		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalZero
 		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).pow(tmp[layer].exponent).times(tmp[layer].gainMult).pow(tmp[layer].gainExp)
-		if (gain.gte(tmp[layer].softcap)) gain = gain.pow(tmp[layer].softcapPower).times(tmp[layer].softcap.pow(decimalOne.sub(tmp[layer].softcapPower)))
+		gain = applySoftcaps(gain, getSoftcapTiers(layer))
 		gain = gain.times(tmp[layer].directMult)
 		return gain.floor().max(0);
 	} else if (type=="custom"){
@@ -60,7 +60,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 		return cost;
 	} else if (type=="normal"){
 		let next = tmp[layer].resetGain.add(1).div(tmp[layer].directMult)
-		if (next.gte(tmp[layer].softcap)) next = next.div(tmp[layer].softcap.pow(decimalOne.sub(tmp[layer].softcapPower))).pow(decimalOne.div(tmp[layer].softcapPower))
+		next = reverseSoftcaps(next, getSoftcapTiers(layer))
 		next = next.root(tmp[layer].gainExp).div(tmp[layer].gainMult).root(tmp[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires)
 		if (tmp[layer].roundUpCost) next = next.ceil()
 		return next;
@@ -74,6 +74,46 @@ function softcap(value, cap, power = 0.5) {
 	if (value.lte(cap)) return value
 	else
 		return value.pow(power).times(cap.pow(decimalOne.sub(power)))
+}
+
+function getSoftcapTiers(layer) {
+	if (tmp[layer].softcaps) return tmp[layer].softcaps
+	return [{ cap: tmp[layer].softcap, power: tmp[layer].softcapPower }]
+}
+
+function applySoftcaps(value, tiers) {
+	let result = value
+	let combinedPower = decimalOne
+	for (const tier of tiers) {
+		if (value.gt(tier.cap)) {
+			result = result.times(value.div(tier.cap).pow(combinedPower.times(tier.power.sub(1))))
+			combinedPower = combinedPower.times(tier.power)
+		}
+	}
+	return result
+}
+
+function reverseSoftcaps(value, tiers) {
+	let result = value
+	for (let index = tiers.length - 1; index >= 0; index--) {
+		const previousTiers = tiers.slice(0, index)
+		const capAfterPrevious = applySoftcaps(tiers[index].cap, previousTiers)
+		result = softcap(result, capAfterPrevious, decimalOne.div(tiers[index].power))
+	}
+	return result
+}
+
+function getSoftcapInfoDisplay(layer) {
+	const tiers = getSoftcapTiers(layer)
+	const color = tmp[layer].color
+	return tiers.map((tier, index) => {
+		if (player[layer].points.lt(tier.cap)) return ""
+		const threshold = `<span style="color:${color};font-weight:bold">${format(tier.cap)}</span>`
+		const tierNumber = index + 1
+		const tierName = `${["", "一", "二", "三", "四", "五", "六", "七", "八", "九"][tierNumber]}重`
+		const power = `<span style="color:${color};font-weight:bold">${format(tier.power)}</span>`
+		return `<h3>${tmp[layer].resource}≥${threshold}时，受到<span style="color:${color};font-weight:bold">${tierName}软上限</span>，超出部分^${power}</h3>`
+	}).filter(Boolean).join("<br>")
 }
 
 // Return true if the layer should be highlighted. By default checks for upgrades only.

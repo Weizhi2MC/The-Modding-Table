@@ -87,6 +87,7 @@ function getPointGen() {
 	if (hasUpgrade('cs2', 11)) g = g.mul(upgradeEffect('cs2', 11))
 	if (hasMilestone('cs2', 2)) g = g.pow(1.05)
 	if (hasMilestone('cs2', 3)) g = g.mul(buyableEffect('cs2', 2))
+	if (hasUpgrade('cs3', 11)) g = g.mul(upgradeEffect('cs3', 11))
 	return g
 }
 
