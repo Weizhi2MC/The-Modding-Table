@@ -41,7 +41,7 @@ function hiddenLeftTable(){
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
+	num: "0.1.3",
 	name: "Literally nothing",
 }
 
@@ -49,11 +49,12 @@ function changelog(){
 	return i18n(`
 		<br><br><br><h1>更新日志:</h1><br>(不存在<span style='color: red'><s>剧透警告</s></span>)<br><br>
 		<span style="font-size: 17px;">
-			<h3><s>你应该自己写这个</s></h3><br><br>
-			<h3>v0.1 - 创作了简易增量页</h3><br>
+			<h3><s>你应该自己写这个</s></h3>
+			
+			<br><br><h3>v0.1.3 - 更新至第三乘数层</h3>
+			<br><br><h3>v0.1 - 创作了简易增量页</h3><br>
 				- 从I wanna be the Creator中的简易增量的二创<br>
-			这游戏体验何尝不是一种NG-x<br><br>- 更新至第二乘数层
-			<br><br>
+			这游戏体验何尝不是一种NG-x<br>- 更新至第一乘数层
 		`, 
 	'', false)
 } 

@@ -139,7 +139,7 @@ addLayer("cs1", {
     gainExp() { // Calculate the exponent on main currency from bonuses
         let p = new Decimal("1")
         if (hasMilestone('cs2', 4)) p = new Decimal("1.1")
-        if (hasMilestone('cs3', 2)) p = p.add(0.03)
+        if (hasMilestone('cs3', 2)) p = p.add(0.05)
         return p
     },
     upgrades: {
@@ -247,6 +247,7 @@ addLayer("cs2", {
         let mult = new Decimal("1")
         if (hasUpgrade('cs2', 14)) mult = mult.mul(upgradeEffect('cs2', 14))
         if (hasMilestone('cs2', 1)) mult = mult.mul(2)
+        if (hasUpgrade('cs3', 12)) mult = mult.mul(upgradeEffect('cs3', 12))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -473,7 +474,7 @@ addLayer("cs3", {
     },
     2: {
         requirementDescription: "达到15.00第三乘数", // Optional text. Use if the milestone has no effect
-        effectDescription: "奖励:第一获取指数+0.03",
+        effectDescription: "奖励:第一获取指数+0.05",
         done() { return player.cs3.points.gte(15) },
     },
     3: {

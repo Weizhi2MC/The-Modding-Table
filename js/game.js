@@ -112,7 +112,7 @@ function getSoftcapInfoDisplay(layer) {
 		const tierNumber = index + 1
 		const tierName = `${["", "一", "二", "三", "四", "五", "六", "七", "八", "九"][tierNumber]}重`
 		const power = `<span style="color:${color};font-weight:bold">${format(tier.power)}</span>`
-		return `<h3>${tmp[layer].resource}≥${threshold}时，受到<span style="color:${color};font-weight:bold">${tierName}软上限</span>，超出部分^${power}</h3>`
+		return `${tmp[layer].resource}≥<h3 class="overlayThing" id="points">${threshold}</h3>时，受到<span style="color:${color};font-weight:bold">${tierName}软上限</span>，超出部分^<h3 class="overlayThing" id="points">${power}</h3>`
 	}).filter(Boolean).join("<br>")
 }
 
