@@ -448,7 +448,7 @@ addLayer("cs3", {
             description: "第三乘数以极其微弱的倍率加成第二乘数获取",
             cost: new Decimal(2),
             effect() {
-        return player[this.layer].points.mul(3).add(2).pow(0.12)
+        return player[this.layer].points.mul(3).add(2).pow(0.15)
         }, // Calculate the effect of the upgrade. Can be a function that takes into account current game state.
         effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, 
         },
@@ -473,13 +473,13 @@ addLayer("cs3", {
         done() { return player.cs3.points.gte(3) },
     },
     2: {
-        requirementDescription: "达到15.00第三乘数", // Optional text. Use if the milestone has no effect
+        requirementDescription: "达到10.00第三乘数", // Optional text. Use if the milestone has no effect
         effectDescription: "奖励:第一获取指数+0.05",
-        done() { return player.cs3.points.gte(15) },
+        done() { return player.cs3.points.gte(10) },
     },
     3: {
-        requirementDescription: "达到70.00第三乘数", // Optional text. Use if the milestone has no effect
-        effectDescription: "奖励:本层每次进行声望重置时，第二乘数=0 → =30<br>解锁购买项微标签页和可重复购买项",
+        requirementDescription: "达到20.00第三乘数", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:解锁挑战",
         done() { return player.cs3.points.gte(7000) },
     },
     },    

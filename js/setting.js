@@ -94,7 +94,10 @@ addLayer("A", {
         unlocked: true,
         points: new Decimal(0),
     }},
-    color: "rgb(174, 255, 34)",
+    color: "#b7df47",
+    nodeStyle: {
+        background: "linear-gradient(135deg, #f7e65a 0%, #a8e63a 100%)",
+    },
     resource: "已完成的成就",
     type: "none",
     tooltip(){return false},
@@ -157,10 +160,8 @@ addLayer("A", {
             "main":{
                 name(){return '常规成就'}, // Name of tab button
                 nameI18N(){return 'main'}, // Second name for internationalization (i18n) if internationalizationMod is enabled
-                content:[
-                    ['row',[
-                    ['achievement', 1],['achievement', 2],['achievement', 3],['achievement', 4],['achievement', 5],['achievement', 6],['achievement', 7],['achievement', 8]]
-                ],            
+                content: [
+                    ["achievements", [0]],
                 ],
             },
         },
