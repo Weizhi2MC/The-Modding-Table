@@ -406,7 +406,7 @@ addLayer("cs3", {
         best: new Decimal("0"),
     }},
     color: "#ffff00",
-    requires: new Decimal("400"), // Can be a function that takes requirement increases into account
+    requires: new Decimal("350"), // Can be a function that takes requirement increases into account
     resource: "第三乘数", // Name of prestige currency
     resourceI18N: "第三乘数", // Second name of the resource for internationalization (i18n) if internationalizationMod is enabled
     baseResource: "第二乘数", // Name of resource prestige is based on
@@ -418,7 +418,7 @@ addLayer("cs3", {
     softcapPower: new Decimal("0.6"),
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal("1")
-        if (hasUpgrade('cs3', 4)) mult = mult.mul(upgradeEffect('cs3', 4))
+        if (hasUpgrade('cs3', 14)) mult = mult.mul(upgradeEffect('cs3', 14))
         if (hasMilestone('cs3', 1)) mult = mult.mul(1.5)
         return mult
     },
@@ -511,6 +511,17 @@ addLayer("cs3", {
             },
         },
     },
+    challenges: {
+    11: {
+        name: "高开低走",
+        challengeDescription: "开始时进行一次第三乘数声望重置<br>金币获取^0.5<br>金币底数获取^0.7<br>第一乘数获取/32<br><br>",
+        canComplete: function() {return player.points.gte("1e100")},
+        rewardEffect(){return new Decimal("1").mul(1)},
+        rewardDescription:"",
+        goalDescription:"",
+        completionLimit:5,
+        },
+    },
     microtabs:{
         tab:{
             "main":{
@@ -532,6 +543,16 @@ addLayer("cs3", {
                 },
                 content:[
                     ['buyable',1]
+                ],
+            },
+            "d":{
+                name(){return '挑战'},
+                nameI18N(){return 'another'},
+                unlocked() {
+                    return hasMilestone("cs3", 3)
+                },
+                content:[
+                    ['challenges',1]
                 ],
             },
             "another":{
