@@ -41,7 +41,7 @@ function hiddenLeftTable(){
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1.3",
+	num: "0.1.4",
 	name: "Literally nothing",
 }
 
@@ -51,7 +51,7 @@ function changelog(){
 		<span style="font-size: 17px;">
 			<h3><s>你应该自己写这个</s></h3>
 			
-			<br><br><h3>v0.1.3 - 更新至第三乘数层</h3>
+			<br><br><h3>v0.1.4 - 更新至第三乘数层</h3>
 			<br><br><h3>v0.1 - 创作了简易增量页</h3><br>
 				- 从I wanna be the Creator中的简易增量的二创<br>
 			这游戏体验何尝不是一种NG-x<br>- 更新至第一乘数层
@@ -89,6 +89,10 @@ function getPointGen() {
 	if (hasMilestone('cs2', 2)) g = g.pow(1.05)
 	if (hasMilestone('cs2', 3)) g = g.mul(buyableEffect('cs2', 2))
 	if (hasUpgrade('cs3', 11)) g = g.mul(upgradeEffect('cs3', 11))
+	if (inChallenge('cs3', 11)) {
+		let completions = challengeCompletions('cs3', 11)
+		g = g.pow(new Decimal(1).sub(new Decimal("0.05").mul(completions)))
+	}
 	return g
 }
 

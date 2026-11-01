@@ -150,6 +150,12 @@ addLayer("A", {
             tooltip:'解锁条件:第三乘数≥1',
             onComplete(){player.A.points = new Decimal(player.A.points.add(1))}
         },
+        9:{
+            name:"a9<br>二重软上限的预兆",
+            done(){return player.p.points.gte(1e110)},
+            tooltip:'解锁条件:金币底数≥1e110',
+            onComplete(){player.A.points = new Decimal(player.A.points.add(1))}
+        },
     },
     doReset() {
         layerDataReset("A", ["achievements", "points"])

@@ -41,17 +41,19 @@ addLayer("p", {
     exponent: 1, // Prestige currency exponent
     softcaps: [
         { cap: new Decimal("3.4e38"), power: new Decimal("0.65") },
-        { cap: new Decimal("1e180"), power: new Decimal("0.45") },
-        { cap: new Decimal("1.79e400"), power: new Decimal("0.1") },
+        { cap: new Decimal("1e150"), power: new Decimal("0.35") },
+        { cap: new Decimal("1.79e308"), power: new Decimal("0.1") },
     ],
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal("1")
         if (hasUpgrade('cs1', 13)) mult = mult.mul(player.cs1.points.mul(0.25).add(1).pow(0.4))
+        if (hasMilestone('p', 3)) mult = mult.mul(buyableEffect('p', 2))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
-        if (hasMilestone('cs2', 4)) return new Decimal(1.03)
-        return new Decimal(1)
+        let p = new Decimal("1")
+        if (hasMilestone('cs2', 4)) p = new Decimal("1.03")
+        return p
     },
     upgrades: {
         11: {
@@ -69,7 +71,28 @@ addLayer("p", {
         requirementDescription: "达到1.00e10金币底数", // Optional text. Use if the milestone has no effect
         effectDescription: "奖励:解锁一个新层级",
         done() { return player.p.points.gte(1e10) },
-    }
+    },
+    2: {
+        requirementDescription: "达到1.00e114金币底数", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:解锁一个技能",
+        done() { if(player.p.points.gte(1e114)&&hasMilestone('cs3',4)) return true},
+        unlocked(){if(hasMilestone('cs3',4)) return true}
+    },
+    3: {
+        requirementDescription: "达到2.00e116金币底数", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:解锁一个技能",
+        done() { if(player.p.points.gte(2e116)&&hasMilestone('cs3',5)) return true},
+        unlocked(){if(hasMilestone('cs3',5)) return true}
+    },
+    4: {
+        requirementDescription: "达到1.50e117金币底数", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:金币底数声望重置时不再重置金币",
+        done() { if(player.p.points.gte(1.5e117)&&hasMilestone('cs3',5)) return true},
+        unlocked(){if(hasMilestone('cs3',5)) return true}
+    },
+    },
+    resetsNothing() {
+        return hasMilestone("p", 4)
     },
     doReset(resettingLayer) {
         if (resettingLayer === "p") return
@@ -77,6 +100,60 @@ addLayer("p", {
         let keep = tmp[resettingLayer].row > tmp.p.row ? ["milestones", "best"] : ["best"]
         if(hasUpgrade('cs2',13)) keep = tmp[resettingLayer].row > tmp.p.row ? ["milestones", "upgrades", "best"] : ["best"]
         layerDataReset("p", keep)
+    },
+    buyables: {
+        1: {
+            title: "蓄力一击",
+            display() {
+                return  "蓄力一击让第一乘数获取x64.00\n"+
+                    "\n\n当前效果:第一乘数获取 x" + format(this.effect()) +
+                    "\n花费: " + format(this.cost()) + " 金币底数" +
+                    "\n\n已购买: " + formatWhole(getBuyableAmount(this.layer, this.id)) + "/" +format(this.purchaseLimit)
+            },
+            cost(amount) {
+                return new Decimal(5e13).pow(amount.add(1))
+            },
+            effect(amount) {
+                return new Decimal(64).pow(amount)
+            },
+            purchaseLimit:1,
+            unlocked() {
+                return hasMilestone("p", 2)
+            },
+            canAfford() {
+                return player.p.points.gte(this.cost())
+            },
+            buy() {
+                player.p.points = player.p.points.sub(this.cost())
+                addBuyables(this.layer, this.id, 1)
+            },
+        },
+        2: {
+            title: "强化器",
+            display() {
+                return  "每次购买金币底数获取x3.00\n"+
+                    "\n\n当前效果:金币底数获取 x" + format(this.effect()) +
+                    "\n花费: " + format(this.cost()) + " 金币底数" +
+                    "\n\n已购买: " + formatWhole(getBuyableAmount(this.layer, this.id)) + "/" +format(this.purchaseLimit)
+            },
+            cost(amount) {
+                return new Decimal(1e15).pow(amount.add(1))
+            },
+            effect(amount) {
+                return new Decimal(3).pow(amount)
+            },
+            purchaseLimit:4,
+            unlocked() {
+                return hasMilestone("p", 3)
+            },
+            canAfford() {
+                return player.p.points.gte(this.cost())
+            },
+            buy() {
+                player.p.points = player.p.points.sub(this.cost())
+                addBuyables(this.layer, this.id, 1)
+            },
+        },
     },
     microtabs:{
         tab:{
@@ -88,10 +165,20 @@ addLayer("p", {
                     ["display-text", function() { return getSoftcapInfoDisplay("p") }],
                 ],
             },
+            "c":{
+                name(){return '技能'},
+                nameI18N(){return 'another'},
+                unlocked() {
+                    return hasMilestone("p", 2)
+                },
+                content:[
+                    ['buyables',[0]]
+                ],
+            },
             "another":{
                 name(){return '里程碑'},
                 nameI18N(){return 'another'},
-                content:[['milestones', 1],
+                content:[['milestones', 4],
                 ],
             }
         },
@@ -128,12 +215,20 @@ addLayer("cs1", {
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.1, // Prestige currency exponent
-    softcap: new Decimal("3.4e38"),
-    softcapPower: new Decimal("0.65"),
+    softcaps: [
+        { cap: new Decimal("1e20"), power: new Decimal("0.65") },
+        { cap: new Decimal("1e180"), power: new Decimal("0.45") },
+        { cap: new Decimal("1.79e400"), power: new Decimal("0.1") },
+    ],
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal("1")
         if (hasUpgrade('cs1', 14)) mult = mult.mul(player.p.points.add(1).log10().add(1).pow(0.5))
         if (hasUpgrade('cs2', 12)) mult = mult.mul(upgradeEffect('cs2', 12))
+        if (inChallenge('cs3', 11)) {
+            let completions = challengeCompletions('cs3', 11)
+            mult = mult.div(new Decimal(16).mul(new Decimal(2).pow(completions)))
+        }
+        if (hasMilestone('p', 2)) mult = mult.mul(buyableEffect('p', 1))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -186,8 +281,42 @@ addLayer("cs1", {
         requirementDescription: "达到1,000,000第一乘数", // Optional text. Use if the milestone has no effect
         effectDescription: "奖励:解锁一个新层级",
         done() { return player.cs1.points.gte(1e6) },
+    },
+    2: {
+        requirementDescription: "达到1.00e17第一乘数", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:解锁一个技能",
+        done() { if(player.cs1.points.gte(1e17)&&hasMilestone('cs3',4)) return true},
+        unlocked(){if(hasMilestone('cs3',4)) return true}
     }
-    },    
+    }, 
+    buyables: {
+        1: {
+            title: "蓄力一击",
+            display() {
+                return  "蓄力一击让第二乘数获取x4.00\n"+
+                    "\n\n当前效果:第二乘数获取 x" + format(this.effect()) +
+                    "\n花费: " + format(this.cost()) + " 第一乘数" +
+                    "\n\n已购买: " + formatWhole(getBuyableAmount(this.layer, this.id)) + "/" +format(this.purchaseLimit)
+            },
+            cost(amount) {
+                return new Decimal(1e6).pow(amount.add(1))
+            },
+            effect(amount) {
+                return new Decimal(4).pow(amount)
+            },
+            purchaseLimit:1,
+            unlocked() {
+                return hasMilestone("cs1", 2)
+            },
+            canAfford() {
+                return player.cs1.points.gte(this.cost())
+            },
+            buy() {
+                player.cs1.points = player.cs1.points.sub(this.cost())
+                addBuyables(this.layer, this.id, 1)
+            },
+        },
+    },   
     microtabs:{
         tab:{
             "main":{
@@ -200,11 +329,21 @@ addLayer("cs1", {
                     ["display-text", function() { return getSoftcapInfoDisplay("cs1") }],
                 ],
             },
+            "c":{
+                name(){return '技能'},
+                nameI18N(){return 'another'},
+                unlocked() {
+                    return hasMilestone("cs1", 2)
+                },
+                content:[
+                    ['buyable',1]
+                ],
+            },
             "another":{
                 name(){return '里程碑'},
                 nameI18N(){return 'another'},
                 content:[
-                    ['milestones',1]
+                    ['milestones',2]
                 ],
             }
         },
@@ -218,7 +357,7 @@ addLayer("cs1", {
        "blank",
        ["microtabs","tab"]
     ],
-    layerShown(){if(hasMilestone('p', 1)||player.cs1.points.gte(1)) { return true } },
+    layerShown(){if(hasMilestone('p', 1)) { return true } },
 })
 
 addLayer("cs2", {
@@ -241,17 +380,20 @@ addLayer("cs2", {
     baseAmount() {return player.cs1.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.1, // Prestige currency exponent
-    softcap: new Decimal("3.4e38"),
-    softcapPower: new Decimal("0.6"),
+    softcaps: [
+        { cap: new Decimal("3.4e38"), power: new Decimal("0.6") },
+    ],
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal("1")
         if (hasUpgrade('cs2', 14)) mult = mult.mul(upgradeEffect('cs2', 14))
         if (hasMilestone('cs2', 1)) mult = mult.mul(2)
         if (hasUpgrade('cs3', 12)) mult = mult.mul(upgradeEffect('cs3', 12))
+        if (hasMilestone('cs1', 2)) mult = mult.mul(buyableEffect('cs1', 1))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
         let p = new Decimal("1")
+        p = p.add(new Decimal("0.02").mul(challengeCompletions('cs3', 11)))
         return p
     },
     upgrades: {
@@ -414,12 +556,14 @@ addLayer("cs3", {
     baseAmount() {return player.cs2.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
-    softcap: new Decimal("3.4e38"),
-    softcapPower: new Decimal("0.6"),
+    softcaps: [
+        { cap: new Decimal("3.4e38"), power: new Decimal("0.6") },
+    ],
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal("1")
         if (hasUpgrade('cs3', 14)) mult = mult.mul(upgradeEffect('cs3', 14))
         if (hasMilestone('cs3', 1)) mult = mult.mul(1.5)
+        if (challengeCompletions('cs3', 11) > 2) mult = mult.mul(challengeCompletions('cs3', 11))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -473,14 +617,26 @@ addLayer("cs3", {
         done() { return player.cs3.points.gte(3) },
     },
     2: {
-        requirementDescription: "达到10.00第三乘数", // Optional text. Use if the milestone has no effect
+        requirementDescription: "达到6.00第三乘数", // Optional text. Use if the milestone has no effect
         effectDescription: "奖励:第一获取指数+0.05",
-        done() { return player.cs3.points.gte(10) },
+        done() { return player.cs3.points.gte(6) },
     },
     3: {
-        requirementDescription: "达到20.00第三乘数", // Optional text. Use if the milestone has no effect
+        requirementDescription: "达到10.00第三乘数", // Optional text. Use if the milestone has no effect
         effectDescription: "奖励:解锁挑战",
-        done() { return player.cs3.points.gte(7000) },
+        done() { return player.cs3.points.gte(10) },
+    },
+    4: {
+        requirementDescription: "完成2.00次 [高开低走] 挑战", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:为金币底数、第一乘数层添加新的里程碑",
+        done() { if(challengeCompletions('cs3', 11)>=2) return true },
+        unlocked(){if(hasMilestone(this.layer,3)) return true}
+    },
+    5: {
+        requirementDescription: "完成4.00次 [高开低走] 挑战", // Optional text. Use if the milestone has no effect
+        effectDescription: "奖励:为金币底数层添加两个新的里程碑",
+        done() { if(challengeCompletions('cs3', 11)>=4) return true },
+        unlocked(){if(hasMilestone(this.layer,4)) return true}
     },
     },    
     buyables: {
@@ -514,11 +670,32 @@ addLayer("cs3", {
     challenges: {
     11: {
         name: "高开低走",
-        challengeDescription: "开始时进行一次第三乘数声望重置<br>金币获取^0.5<br>金币底数获取^0.7<br>第一乘数获取/32<br><br>",
-        canComplete: function() {return player.points.gte("1e100")},
-        rewardEffect(){return new Decimal("1").mul(1)},
-        rewardDescription:"",
-        goalDescription:"",
+        challengeDescription() {
+            let completions = challengeCompletions('cs3', 11)
+            let goldExponent = new Decimal("1").sub(new Decimal("0.05").mul(completions))
+            let firstMultiplierDivisor = new Decimal(16).mul(new Decimal(2).pow(completions))
+            return "惩罚：金币获取^" + format(goldExponent) +
+                "<br>第一乘数获取÷" + formatWhole(firstMultiplierDivisor) +
+                "<br>完成次数：" + formatWhole(completions) + "/" + this.completionLimit +"<br>完成三次挑战后解锁第二奖励<br><br>"
+        },
+        goal() {
+            let completions = challengeCompletions('cs3', 11)
+            return new Decimal("1e60").mul(new Decimal("1e6").pow(completions))
+        },
+        rewardEffect() {
+            return new Decimal("0.02").mul(challengeCompletions('cs3', 11))
+        },
+        rewardDescription() {
+            let completions = challengeCompletions('cs3', 11)
+            let description = "第二乘数获取指数+" + format(this.rewardEffect())
+            if (completions > 2) {
+                description += "<br>第三乘数获取×" + formatWhole(completions)
+            }
+            return description
+        },
+        //rewardDisplay() {
+            //return this.rewardDescription()
+        //},
         completionLimit:5,
         },
     },
@@ -539,7 +716,7 @@ addLayer("cs3", {
                 name(){return '购买项'},
                 nameI18N(){return 'another'},
                 unlocked() {
-                    return hasMilestone("cs3", 3)
+                    return hasMilestone("cs3", 6)
                 },
                 content:[
                     ['buyable',1]
@@ -559,7 +736,7 @@ addLayer("cs3", {
                 name(){return '里程碑'},
                 nameI18N(){return 'another'},
                 content:[
-                    ['milestones',2]
+                    ['milestones',5]
                 ],
             },
 
